@@ -62,6 +62,11 @@ func main() {
 	// Routes consist of a path and a handler function.
 	r.HandleFunc("/api/v1/devices", DeviceIndex)
 	r.HandleFunc("/", DashboardIndex)
+	r.HandleFunc("/ui/manage/rooms", RoomList)
+	r.HandleFunc("/ui/manage/rooms/add", RoomAdd)
+	r.HandleFunc("/ui/manage/rooms/edit", RoomEdit)
+	r.HandleFunc("/ui/manage/rooms/delete", RoomDelete)
+
 	//r.HandleFunc("/api/v1/device/{id}", ApiDeviceHandler)
 
 	go func() {
