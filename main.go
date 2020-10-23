@@ -68,7 +68,6 @@ func main() {
 	// Prepare GinMode
 	var ginMode string
 
-<<<<<<< HEAD
 	switch GlobalConfig.Debugging.Router.Mode {
 	case "PROD":
 		LogInstance.Debugln("Set router Mode to PROD")
@@ -86,45 +85,6 @@ func main() {
 	router.Static("/assets", "ui/assets")
 	router.Static("/"+GlobalConfig.ImageStorePath, GlobalConfig.ImageStorePath)
 	router.LoadHTMLGlob("ui/templates/*")
-=======
-	r := mux.NewRouter()
-	staticDir := "/ui/assets/"
-	// Create the route
-	r.PathPrefix(staticDir).Handler(http.StripPrefix(staticDir, http.FileServer(http.Dir("."+staticDir))))
-	// Routes consist of a path and a handler function.
-	r.HandleFunc("/api/v1/devices", DeviceIndex)
-	r.HandleFunc("/", DashboardIndex)
-
-	// Rooms
-	r.HandleFunc("/ui/manage/rooms", RoomList)
-	r.HandleFunc("/ui/manage/rooms/add", RoomAdd)
-	r.HandleFunc("/ui/manage/rooms/edit/{id}", RoomEdit)
-	r.HandleFunc("/ui/manage/rooms/delete/{id}", RoomDelete)
-	// Buildings
-	r.HandleFunc("/ui/manage/buildings", BuildingList)
-	r.HandleFunc("/ui/manage/buildings/add", BuildingAdd)
-	r.HandleFunc("/ui/manage/buildings/insert", BuildingInsert)
-	r.HandleFunc("/ui/manage/buildings/edit/{id}", BuildingEdit)
-	r.HandleFunc("/ui/manage/buildings/update", BuildingUpdate)
-	r.HandleFunc("/ui/manage/buildings/delete/{id}", BuildingDelete)
-	r.HandleFunc("/ui/manage/buildings/remove/{id}", BuildingRemove)
-
-	// Devices
-	r.HandleFunc("/ui/manage/devices/discovered", DiscoveredDevices)
-
-	//r.HandleFunc("/api/v1/device/{id}", ApiDeviceHandler)
-
-	go func() {
-		fmt.Println("CoIoT Listener started")
-		log.Fatal(http.ListenAndServe(":8000", r))
-	}()
-
-	mux := coiot.NewServeMux()
-	mux.Handle("/cit/s", coiot.FuncHandler(CoIoTHandler))
-	log.Fatal(coiot.ListenAndServe("udp", "224.0.1.187:5683", mux))
-}
-func DeviceIndex(w http.ResponseWriter, r *http.Request) {
->>>>>>> 39b25c89a9324b9298b1e2e7d1a61467a3dfbaaa
 
 	app := router.Group("/app")
 	apiV1 := router.Group("/api/v1")
