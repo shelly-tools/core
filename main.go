@@ -2,93 +2,113 @@ package main
 
 import (
 	"fmt"
-	"html/template"
-	"log"
-	"net"
+	"io/ioutil"
 	"net/http"
-	"sync"
-	"time"
 
-	"github.com/gorilla/mux"
-	jsoniter "github.com/json-iterator/go"
-	"github.com/shelly-tools/coiot"
-	"github.com/tidwall/gjson"
+	"github.com/gin-gonic/gin"
+	"github.com/shelly-tools/core/config"
+	log "github.com/sirupsen/logrus"
 )
 
-var tmpl = template.Must(template.ParseGlob("ui/views/*"))
+var (
+	GlobalConfig *config.Config
+	LogInstance  *log.Logger
+)
 
-type Payload struct {
-	G [][]interface{} `json:"G"`
+func init() {
+	// Prepare logging environment
+
+	LogInstance = log.New()
+
+	LogInstance.SetFormatter(&log.TextFormatter{
+		DisableColors: false,
+		FullTimestamp: true,
+	})
+
+	LogInstance.SetLevel(log.ErrorLevel)
 }
 
-var netClient = &http.Client{
-	Timeout: time.Second * 5,
-}
-var Data = map[string]map[int]interface{}{}
-var Mutex = &sync.Mutex{}
+func init() {
+	var err error
 
-func CoIoTHandler(l *net.UDPConn, a *net.UDPAddr, m *coiot.Message) *coiot.Message {
+	// read config file and create a new Config Struct
+	fileData, err := ioutil.ReadFile("core_config.yaml")
 
-	//s := string(m.Payload)
-	// non-coiot message? just skip..
-	if m.OptionDevice() == nil {
-		return nil
+	if err != nil {
+		LogInstance.Fatal(err)
 	}
-	mp := make(map[int]interface{})
-	pl := make(map[int]interface{})
-	if m != nil {
-		keys := gjson.GetBytes(m.Payload, "G.#.1")
-		values := gjson.GetBytes(m.Payload, "G.#.2")
-		for k, v := range values.Array() {
-			mp[k] = v.Value()
-		}
-		for k, v := range keys.Array() {
-			pl[int(v.Int())] = mp[k]
-		}
-	}
-	Mutex.Lock()
-	Data[m.DeviceID()+"#"+m.DeviceType()+"#"+a.String()] = pl
-	Mutex.Unlock()
 
-	return nil
+	// Generate new config with all defaults
+	GlobalConfig, err = config.New(fileData)
+
+	if err != nil {
+		LogInstance.Println(err)
+	}
+
+	fmt.Println("Config loaded", GlobalConfig)
+
+	// Set correct log Level
+
+	var logLevel log.Level
+	switch GlobalConfig.Debugging.Logging.LogLevel {
+	case "debug":
+		logLevel = log.DebugLevel
+	case "info":
+		logLevel = log.InfoLevel
+	case "error":
+		logLevel = log.ErrorLevel
+	default:
+		logLevel = log.DebugLevel
+	}
+
+	LogInstance.SetLevel(logLevel)
 }
 
 func main() {
+	// Prepare GinMode
+	var ginMode string
 
-	r := mux.NewRouter()
-	staticDir := "/ui/assets/"
-	// Create the route
-	r.PathPrefix(staticDir).Handler(http.StripPrefix(staticDir, http.FileServer(http.Dir("."+staticDir))))
-	// Routes consist of a path and a handler function.
-	r.HandleFunc("/api/v1/devices", DeviceIndex)
-	r.HandleFunc("/", DashboardIndex)
-	r.HandleFunc("/ui/manage/rooms", RoomList)
-	r.HandleFunc("/ui/manage/rooms/add", RoomAdd)
-	r.HandleFunc("/ui/manage/rooms/edit", RoomEdit)
-	r.HandleFunc("/ui/manage/rooms/delete", RoomDelete)
+	switch GlobalConfig.Debugging.Router.Mode {
+	case "PROD":
+		LogInstance.Debugln("Set router Mode to PROD")
+		ginMode = gin.ReleaseMode
+	case "DEV":
+		LogInstance.Debugln("Set router Mode to DEV")
+		ginMode = gin.TestMode
+	}
 
-	//r.HandleFunc("/api/v1/device/{id}", ApiDeviceHandler)
+	gin.SetMode(ginMode)
+	gin.Default().AppEngine = GlobalConfig.Debugging.Router.AppEngine
 
-	go func() {
-		fmt.Println("CoIoT Listener started")
-		log.Fatal(http.ListenAndServe(":8000", r))
-	}()
+	router := gin.Default()
 
-	mux := coiot.NewServeMux()
-	mux.Handle("/cit/s", coiot.FuncHandler(CoIoTHandler))
-	log.Fatal(coiot.ListenAndServe("udp", "224.0.1.187:5683", mux))
+	router.Static("/assets", "ui/assets")
+	router.Static("/"+GlobalConfig.ImageStorePath, GlobalConfig.ImageStorePath)
+	router.LoadHTMLGlob("ui/templates/*")
+
+	app := router.Group("/app")
+	apiV1 := router.Group("/api/v1")
+	apiV1.Use(CORS)
+
+	prepareAPIV1(apiV1)
+	prepareApp(app)
+
+	router.Run(GlobalConfig.UI.ListenAdress + ":" + fmt.Sprint(GlobalConfig.UI.ListenPort))
 }
-func DeviceIndex(w http.ResponseWriter, r *http.Request) {
 
-	Mutex.Lock()
-	//jsonData, err := json.Marshal(Data)
-	var json = jsoniter.ConfigCompatibleWithStandardLibrary
-	jsonData, _ := json.Marshal(&Data)
-	Mutex.Unlock()
+// CORS Middleware
+func CORS(c *gin.Context) {
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonData)
-}
-func DashboardIndex(w http.ResponseWriter, r *http.Request) {
-	tmpl.ExecuteTemplate(w, "DashboardIndex", "")
+	// First, we add the headers with need to enable CORS
+	// Make sure to adjust these headers to your needs
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Methods", "*")
+	c.Header("Access-Control-Allow-Headers", "Content-Type")
+
+	// Second, we handle the OPTIONS problem
+	if c.Request.Method != "OPTIONS" {
+		c.Next()
+	} else {
+		c.AbortWithStatus(http.StatusOK)
+	}
 }

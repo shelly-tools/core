@@ -1,5 +1,6 @@
-package main
+package models
 
+// User represents a User for the UI or the API
 type User struct {
 	IDUser   int    `storm:"id,unique"`
 	Username string `storm:"index"`
@@ -8,7 +9,4 @@ type User struct {
 	Name     string
 	EMail    string
 	Password string
-}
-type Users struct {
-	User []User
 }

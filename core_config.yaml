@@ -1,0 +1,9 @@
+ui:
+  listenAdress: 0.0.0.0
+  listenPort: 8080
+debugging:
+  router:
+    mode: DEV
+    appEngine: true
+  logging:
+    logLevel: DEBUG
