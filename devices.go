@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"net/http"
+	"time"
+)
 
 type Device struct {
 	IDDevice   string `storm:"id,unique"`
@@ -16,4 +19,8 @@ type Device struct {
 
 type Devices struct {
 	Device []Device
+}
+
+func DiscoveredDevices(w http.ResponseWriter, r *http.Request) {
+	tmpl.ExecuteTemplate(w, "DiscoveredDevices", "")
 }
