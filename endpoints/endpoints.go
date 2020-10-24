@@ -8,8 +8,8 @@ import (
 
 // RegisterAPIV1Endpoints registers all api endpoints to the api router group
 func RegisterAPIV1Endpoints(api *gin.RouterGroup) {
-	api.POST("/rooms/create")
-
+	// endpoints for rooms
+	api.POST("/rooms/create", API.InsertOneRoom)
 	api.GET("/rooms/get/all", API.GetAllRooms)
 }
 

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/asdine/storm/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/shelly-tools/core/common"
 	"github.com/shelly-tools/core/config"
@@ -59,9 +60,20 @@ func init() {
 	}
 
 	common.LogInstance.SetLevel(logLevel)
+
 }
 
 func main() {
+	var err error
+	//prepare Database
+	common.DB, err = storm.Open(common.Config.DatabasePath)
+
+	if err != nil {
+		common.LogInstance.Errorf("Failed to open database: %s", err)
+	} else {
+		defer common.DB.Close()
+	}
+
 	// Prepare GinMode
 	var ginMode string
 

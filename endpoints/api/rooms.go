@@ -1,43 +1,39 @@
 package api
 
 import (
-	"fmt"
-	"log"
+	"net/http"
 
-	"github.com/asdine/storm/v3"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/shelly-tools/core/common"
 	"github.com/shelly-tools/core/models"
 )
 
 // GetAllRooms returns all rooms found in the database specified in the config
 func GetAllRooms(c *gin.Context) {
-	db, err := storm.Open(common.Config.DatabasePath)
-	if err != nil {
-		fmt.Println("Error", err)
-	}
-	defer db.Close()
+	var rooms []models.Room
 
-	file, err := c.FormFile("file")
-	if err != nil {
-		fmt.Println("Error", err)
-	}
-	filePath := common.Config.ImageStorePath + file.Filename
-	fmt.Println("Store to", filePath)
-	err = c.SaveUploadedFile(file, filePath)
+	err := common.DB.All(&rooms)
 
 	if err != nil {
-		log.Println(err)
+		common.LogInstance.Errorf("Failed to get all rooms from the db:", err)
 	}
 
-	roomName := c.PostForm("roomName")
-	roomInstance := models.Room{
-		RoomPicture: "/" + filePath,
-		RoomName:    roomName,
-	}
+	c.JSON(http.StatusOK, rooms)
+}
 
-	err = db.Save(&roomInstance)
-	if err != nil {
-		fmt.Println("Error", err)
+// InsertOneRoom inserts a room into the database
+func InsertOneRoom(c *gin.Context) {
+	var room models.Room
+	if err := c.ShouldBindBodyWith(&room, binding.JSON); err == nil {
+		c.String(http.StatusOK, "Body loaded", room.RoomName)
+
+		err := common.DB.Save(&room)
+		if err != nil {
+			common.LogInstance.Errorf("Failed to store room instance in database: %s", err)
+		}
+
+	} else {
+		c.String(http.StatusBadRequest, "JSON Structur for a room is wrong")
 	}
 }
