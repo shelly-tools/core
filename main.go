@@ -6,26 +6,23 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shelly-tools/core/common"
 	"github.com/shelly-tools/core/config"
+	endpoint "github.com/shelly-tools/core/endpoints"
 	log "github.com/sirupsen/logrus"
-)
-
-var (
-	GlobalConfig *config.Config
-	LogInstance  *log.Logger
 )
 
 func init() {
 	// Prepare logging environment
 
-	LogInstance = log.New()
+	common.LogInstance = log.New()
 
-	LogInstance.SetFormatter(&log.TextFormatter{
+	common.LogInstance.SetFormatter(&log.TextFormatter{
 		DisableColors: false,
 		FullTimestamp: true,
 	})
 
-	LogInstance.SetLevel(log.ErrorLevel)
+	common.LogInstance.SetLevel(log.ErrorLevel)
 }
 
 func init() {
@@ -35,22 +32,22 @@ func init() {
 	fileData, err := ioutil.ReadFile("core_config.yaml")
 
 	if err != nil {
-		LogInstance.Fatal(err)
+		common.LogInstance.Fatal(err)
 	}
 
 	// Generate new config with all defaults
-	GlobalConfig, err = config.New(fileData)
+	common.Config, err = config.New(fileData)
 
 	if err != nil {
-		LogInstance.Println(err)
+		common.LogInstance.Println(err)
 	}
 
-	fmt.Println("Config loaded", GlobalConfig)
+	fmt.Println("Config loaded", common.Config)
 
 	// Set correct log Level
 
 	var logLevel log.Level
-	switch GlobalConfig.Debugging.Logging.LogLevel {
+	switch common.Config.Debugging.Logging.LogLevel {
 	case "debug":
 		logLevel = log.DebugLevel
 	case "info":
@@ -61,39 +58,39 @@ func init() {
 		logLevel = log.DebugLevel
 	}
 
-	LogInstance.SetLevel(logLevel)
+	common.LogInstance.SetLevel(logLevel)
 }
 
 func main() {
 	// Prepare GinMode
 	var ginMode string
 
-	switch GlobalConfig.Debugging.Router.Mode {
+	switch common.Config.Debugging.Router.Mode {
 	case "PROD":
-		LogInstance.Debugln("Set router Mode to PROD")
+		common.LogInstance.Debugln("Set router Mode to PROD")
 		ginMode = gin.ReleaseMode
 	case "DEV":
-		LogInstance.Debugln("Set router Mode to DEV")
+		common.LogInstance.Debugln("Set router Mode to DEV")
 		ginMode = gin.TestMode
 	}
 
 	gin.SetMode(ginMode)
-	gin.Default().AppEngine = GlobalConfig.Debugging.Router.AppEngine
+	gin.Default().AppEngine = common.Config.Debugging.Router.AppEngine
 
 	router := gin.Default()
 
 	router.Static("/assets", "ui/assets")
-	router.Static("/"+GlobalConfig.ImageStorePath, GlobalConfig.ImageStorePath)
+	router.Static("/"+common.Config.ImageStorePath, common.Config.ImageStorePath)
 	router.LoadHTMLGlob("ui/templates/*")
 
 	app := router.Group("/app")
 	apiV1 := router.Group("/api/v1")
 	apiV1.Use(CORS)
 
-	prepareAPIV1(apiV1)
-	prepareApp(app)
+	endpoint.RegisterAPPEndpoints(app)
+	endpoint.RegisterAPIV1Endpoints(apiV1)
 
-	router.Run(GlobalConfig.UI.ListenAdress + ":" + fmt.Sprint(GlobalConfig.UI.ListenPort))
+	router.Run(common.Config.UI.ListenAdress + ":" + fmt.Sprint(common.Config.UI.ListenPort))
 }
 
 // CORS Middleware
