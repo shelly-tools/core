@@ -1,0 +1,49 @@
+{{ template "header.html" }}
+  {{ template "menue.html" }}
+  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h4 style="color:#eee;">Buildings</h4>    
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group mr-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="new" name="new">Create</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+            This week
+          </button>
+        </div>
+    </div>
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Building</th>
+        <th style="width: 150px">Edit / Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .data}}
+      <tr>
+        <td>{{ .IDBuilding}}</td>
+        <td>{{ .BuildingName }}</td>
+        <td>
+          <a style="margin: 0 5px" href="/ui/manage/buildings/edit/{{ .IDBuilding }}" type="button" class="btn btn-sm btn-outline-info"><i class="mdi mdi-cog-outline"></i></a>
+          <a style="margin: 0 5px" href="/ui/manage/buildings/delete/{{ .IDBuilding }}" type="button" class="btn btn-sm btn-outline-danger"><i class="mdi mdi-delete"></i></a>
+        </td>
+      </tr>
+    {{ end }}
+    </tbody>
+  </table>
+  {{ template "footer.html" }}
+  <script>
+    $( document ).ready(function() {
+      console.log("is ready");
+      $( "#new" ).click(function() {
+        console.log("FIRED");
+        window.location.replace("/app/buildings/manage/create")
+      });
+    });
+  </script>
+  
+</body>
+</html>

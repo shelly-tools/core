@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"log"
 	"net/http"
@@ -115,3 +116,4 @@ func BuildingInsert(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/ui/manage/buildings", 301)
 }
+*/

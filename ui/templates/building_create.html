@@ -1,0 +1,24 @@
+{{ template "header.html" }}
+  {{ template "menue.html" }}
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Create Building</h1>
+          </div>
+          <form enctype="multipart/form-data" action="/api/v1/buildings/create" method="POST">
+            <div class="form-group">
+              <label for="roomName">Name of the Building</label>
+              <input type="text" class="form-control" name="buildingName" id="buildingName" aria-describedby="roomNameHelp" placeholder="Enter name of the room">
+            </div>
+            <div class="form-group">
+              <label for="buildingPicture">Building picture</label>
+              <input type="file" class="form-control-file" id="file" name="file">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+           
+        </main>
+    </div>
+		{{ template "footer.html" }}
+ </body>
+</html>
