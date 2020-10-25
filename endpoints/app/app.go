@@ -15,6 +15,9 @@ func Root(c *gin.Context) {
 		"title": "Main website",
 	})
 }
+func RootM(c *gin.Context) {
+	c.File("app.html")
+}
 
 func Rooms(c *gin.Context) {
 	db, err := storm.Open(common.Config.DatabasePath)
@@ -32,5 +35,11 @@ func Rooms(c *gin.Context) {
 	c.HTML(http.StatusOK, "rooms.html", gin.H{
 		"title": "Main website",
 		"data":  rooms,
+	})
+}
+
+func Buildings(c *gin.Context) {
+	c.HTML(http.StatusOK, "buildings.html", gin.H{
+		"title": "Main website",
 	})
 }

@@ -93,6 +93,7 @@ func main() {
 
 	router.Static("/assets", "ui/assets")
 	router.Static("/"+common.Config.ImageStorePath, common.Config.ImageStorePath)
+	router.Static("/webui", "./webui")
 	router.LoadHTMLGlob("ui/templates/*")
 
 	app := router.Group("/app")

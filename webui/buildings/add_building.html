@@ -1,0 +1,22 @@
+<br><h2>Add Building</h2>
+
+<form id="building">
+    <div class="form-group">
+      <label for="buildingname">Building Name</label>
+      <input type="text" class="form-control" id="buildingname" aria-describedby="buildingname" placeholder="Enter building name">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  <script>
+    building.onsubmit = async (e) => {
+      e.preventDefault();
+       let response = await fetch('../api/v1/buildings/create', {
+        method: 'POST',
+        body: new FormData(building)
+      });
+  
+      let result = await response.json();
+  
+      alert(result.message);
+    };
+  </script>
