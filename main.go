@@ -113,6 +113,7 @@ func CORS(c *gin.Context) {
 	// Make sure to adjust these headers to your needs
 	c.Header("Access-Control-Allow-Origin", "*")
 	c.Header("Access-Control-Allow-Methods", "*")
+	c.Header("Access-Control-Allow-Credentials", "true")
 	c.Header("Access-Control-Allow-Headers", "Content-Type")
 
 	// Second, we handle the OPTIONS problem

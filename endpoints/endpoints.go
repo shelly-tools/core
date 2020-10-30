@@ -17,6 +17,9 @@ func RegisterAPIV1Endpoints(api *gin.RouterGroup) {
 	api.POST("/buildings/delete", API.DeleteOneBuilding)
 	api.GET("/buildings/get/all", API.GetAllBuildings)
 	api.GET("/buildings/get/id/:id", API.GetBuilding)
+
+	// endpoints for devices
+	api.GET("/devices/discover", API.DiscoverShellys)
 }
 
 // RegisterAPPEndpoints registers all app endpoints to the app router group

@@ -1,0 +1,5 @@
+<br><h2>Buildings</h2><button onclick="addBuilding();" type="button" class="btn btn-primary">Add building</button>
+{{#.}}
+<h4>{{BuildingName}} - <button onclick="deleteBuilding({{IDBuilding}});" type="button" class="btn btn-danger">Delete building</button></h4>
+{{/.}}
+{{^.}}<div>No buildings found.</div><button onclick="addBuilding();" type="button" class="btn btn-primary">Add building</button>{{/.}}

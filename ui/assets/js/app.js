@@ -11,12 +11,13 @@ function loadRooms() {
         })
     });
 }
+
 function loadBuildings() {
-  var tpldata;
+  var tpldata = {};
   fetch('buildings/buildings.html',{cache: "no-store"})
     .then((response) => response.text())
     .then((template) => {
-      fetch('../api/v1/buildings/get/all')
+      fetch('/api/v1/buildings/get/all')
         .then(res => res.json())
         .then(data => tpldata = data)
         .then(() => {
@@ -24,6 +25,7 @@ function loadBuildings() {
         })
     });
 }
+
 function deleteBuilding(id) {
   var tpldata;
   fetch('buildings/delete_building.html',{cache: "no-store"})
