@@ -1,21 +1,6 @@
 <template>
   <div>
-    <div
-      class="card"
-      style="width: 18rem"
-      v-for="(item, index) in buildings"
-      :key="index"
-    >
-      <img class="card-img-top" src="#" alt="Card image cap" />
-      <div class="card-body">
-        <h5 class="card-title">{{ item.buildingName }}</h5>
-        <p class="card-text">
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
-        </p>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
-      </div>
-    </div>
+    <router-view />
   </div>
 </template>
 
@@ -25,12 +10,44 @@ export default {
   data() {
     return {
       buildings: [],
+      image: '',
+      name: '',
     };
   },
   created() {
     this.getAllBuildings();
   },
   methods: {
+    getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    },
+    async createBuilding() {
+      // Creates a new Building
+      if (typeof this.$refs.file.files[0] !== 'undefined') {
+        this.image = this.$refs.file.files[0];
+      }
+      console.log(this.image);
+      const jsonBody = {
+        pictureData:
+          this.image !== ''
+            ? String(await this.getBase64(this.image)).substring(23)
+            : '',
+        picturePath: this.image !== '' ? this.image.name : '',
+        name: this.name,
+      };
+
+      console.log('JSON', JSON.stringify(jsonBody));
+
+      await fetch('http://localhost:8080/api/v1/buildings/create', {
+        method: 'POST',
+        body: JSON.stringify(jsonBody),
+      });
+    },
     async getAllBuildings() {
       // runs when the component is created
       // now fetch all existing buildings
@@ -43,7 +60,6 @@ export default {
 
       // transform request to json and assign it to the local buildings
       const data = await response.json();
-      console.log(data);
       this.buildings = data;
     },
   },

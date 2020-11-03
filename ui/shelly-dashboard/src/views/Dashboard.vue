@@ -4,7 +4,7 @@
       class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow"
     >
       <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#"
-        >Shelly Core</a
+        >Company name</a
       >
       <button
         class="navbar-toggler position-absolute d-md-none collapsed"
@@ -29,6 +29,7 @@
         </li>
       </ul>
     </nav>
+
     <div class="container-fluid">
       <div class="row">
         <nav
@@ -38,27 +39,22 @@
           <div class="sidebar-sticky pt-3">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link" href="/">Dashboard</a>
+                <a class="nav-link active" href="/">Dashboard</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/buildings">Buildings</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/rooms">Rooms</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/devices">Devices</a>
+                <a class="nav-link" href="/buildings/show">Buildings</a>
               </li>
             </ul>
           </div>
         </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+          <div id="main" class="container" style="margin-top: 50px">
+            <router-view />
+          </div>
+        </main>
       </div>
     </div>
-    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-      <div id="main" class="container" style="margin-top: 50px">
-        <router-view />
-      </div>
-    </main>
   </div>
 </template>
 

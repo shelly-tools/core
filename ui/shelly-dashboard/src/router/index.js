@@ -13,6 +13,19 @@ const routes = [
         path: 'buildings',
         name: 'buildings',
         component: () => import('../views/Dashboard/Buildings.vue'),
+        children: [
+          {
+            path: 'detailed/:id',
+            name: 'detailedBuilding',
+            props: true,
+            component: () => import('../views/Dashboard/Buildings/Detailed.vue'),
+          },
+          {
+            path: 'show',
+            name: 'showBuilding',
+            component: () => import('../views/Dashboard/Buildings/Show.vue'),
+          },
+        ],
       },
       {
         path: 'devices',

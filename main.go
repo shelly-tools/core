@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/asdine/storm/v3"
+	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/shelly-tools/core/common"
 	"github.com/shelly-tools/core/config"
@@ -98,7 +99,8 @@ func main() {
 
 	app := router.Group("/app")
 	apiV1 := router.Group("/api/v1")
-	apiV1.Use(CORS)
+
+	apiV1.Use(cors.Default())
 
 	endpoint.RegisterAPPEndpoints(app)
 	endpoint.RegisterAPIV1Endpoints(apiV1)
@@ -108,7 +110,6 @@ func main() {
 
 // CORS Middleware
 func CORS(c *gin.Context) {
-
 	// First, we add the headers with need to enable CORS
 	// Make sure to adjust these headers to your needs
 	c.Header("Access-Control-Allow-Origin", "*")

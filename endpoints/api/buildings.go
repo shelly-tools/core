@@ -1,7 +1,9 @@
 package api
 
 import (
+	"encoding/base64"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +25,7 @@ func GetAllBuildings(c *gin.Context) {
 	c.JSON(http.StatusOK, buildings)
 }
 
-// GetAllBuildings returns all buildings found in the database specified in the config
+// GetBuilding returns all buildings found in the database specified in the config
 func GetBuilding(c *gin.Context) {
 	var building models.Building
 	id := c.Param("id")
@@ -36,17 +38,41 @@ func GetBuilding(c *gin.Context) {
 	c.JSON(http.StatusOK, building)
 }
 
-// InsertOneBuidling inserts a building into the database
+// InsertOneBuilding inserts a building into the database
 func InsertOneBuilding(c *gin.Context) {
 	var msg struct {
 		Status string `json:"status"`
 	}
+
 	var building models.Building
+
 	if err := c.ShouldBindBodyWith(&building, binding.JSON); err == nil {
 		msg.Status = "ok"
 		c.JSON(http.StatusOK, msg)
 
-		err := common.DB.Save(&building)
+		decodedString, err := base64.StdEncoding.DecodeString(building.PictureData)
+		if err != nil {
+			panic(err)
+		}
+
+		building.PicturePath = common.Config.ImageStorePath + building.PicturePath
+
+		f, err := os.Create(building.PicturePath)
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+
+		if _, err := f.Write(decodedString); err != nil {
+			panic(err)
+		}
+
+		if err := f.Sync(); err != nil {
+			panic(err)
+		}
+
+		building.PictureData = ""
+		err = common.DB.Save(&building)
 		if err != nil {
 			common.LogInstance.Errorf("Failed to store building instance in database: %s", err)
 		}
@@ -55,6 +81,7 @@ func InsertOneBuilding(c *gin.Context) {
 	}
 }
 
+// DeleteOneBuilding deletes a selected building over the ID
 func DeleteOneBuilding(c *gin.Context) {
 	var msg struct {
 		Status string `json:"status"`
