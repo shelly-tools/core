@@ -14,7 +14,7 @@ func Root(c *gin.Context) {
 	})
 }
 
-func Rooms(c *gin.Context) {
+func GetAllRooms(c *gin.Context) {
 
 	var rooms []models.Room
 
@@ -28,7 +28,7 @@ func Rooms(c *gin.Context) {
 	})
 }
 
-func Buildings(c *gin.Context) {
+func GetAllBuildings(c *gin.Context) {
 
 	var buildings []models.Building
 	err := common.DB.All(&buildings)
