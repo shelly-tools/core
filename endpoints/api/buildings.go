@@ -30,7 +30,7 @@ func GetBuilding(c *gin.Context) {
 	var building models.Building
 	id := c.Param("id")
 	i, _ := strconv.Atoi(id)
-	err := common.DB.One("IDBuilding", i, &building)
+	err := common.DB.One("ID", i, &building)
 	if err != nil {
 		common.LogInstance.Errorf("Failed to get all buildings from the db:", err)
 	}
