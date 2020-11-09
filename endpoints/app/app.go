@@ -41,3 +41,27 @@ func GetAllBuildings(c *gin.Context) {
 		"data":  buildings,
 	})
 }
+
+func AddBuilding(c *gin.Context) {
+
+	c.HTML(http.StatusOK, "building_create.html", gin.H{
+		"title": "Add Building",
+	})
+}
+
+// InsertBuilding inserts a building into the database
+func InsertBuilding(c *gin.Context) {
+
+	var building models.Building
+
+	if err := c.ShouldBind(&building); err == nil {
+		err := common.DB.Save(&building)
+		if err != nil {
+			common.LogInstance.Errorf("Failed to store room instance in database: %s", err)
+		}
+		c.Redirect(http.StatusFound, "/app/buildings")
+
+	} else {
+		c.String(http.StatusBadRequest, "JSON Structur for a room is wrong")
+	}
+}
