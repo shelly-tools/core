@@ -1,10 +1,8 @@
 package app
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/asdine/storm/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/shelly-tools/core/common"
 	"github.com/shelly-tools/core/models"
@@ -15,31 +13,31 @@ func Root(c *gin.Context) {
 		"title": "Main website",
 	})
 }
-func RootM(c *gin.Context) {
-	c.File("app.html")
-}
 
 func Rooms(c *gin.Context) {
-	db, err := storm.Open(common.Config.DatabasePath)
-	if err != nil {
-		fmt.Println("Error", err)
-	}
-	defer db.Close()
 
 	var rooms []models.Room
 
-	err = db.All(&rooms)
+	err := common.DB.All(&rooms)
 	if err != nil {
-		fmt.Println("Error", err)
+		common.LogInstance.Errorf("Failed to get all rooms from the db:", err)
 	}
 	c.HTML(http.StatusOK, "rooms.html", gin.H{
-		"title": "Main website",
+		"title": "Manage Rooms",
 		"data":  rooms,
 	})
 }
 
 func Buildings(c *gin.Context) {
+
+	var buildings []models.Building
+	err := common.DB.All(&buildings)
+	if err != nil {
+		common.LogInstance.Errorf("Failed to get all buildings from the db:", err)
+	}
+
 	c.HTML(http.StatusOK, "buildings.html", gin.H{
-		"title": "Main website",
+		"title": "Manage Buildings",
+		"data":  buildings,
 	})
 }
