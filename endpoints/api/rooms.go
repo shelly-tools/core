@@ -26,7 +26,7 @@ func GetAllRooms(c *gin.Context) {
 func InsertOneRoom(c *gin.Context) {
 	var room models.Room
 	if err := c.ShouldBindBodyWith(&room, binding.JSON); err == nil {
-		c.String(http.StatusOK, "Body loaded", room.RoomName)
+		c.String(http.StatusOK, "Body loaded", room.Name)
 
 		err := common.DB.Save(&room)
 		if err != nil {

@@ -24,7 +24,6 @@ func GetAllBuildings(c *gin.Context) {
 }
 
 func AddBuilding(c *gin.Context) {
-
 	c.HTML(http.StatusOK, "building_create.html", gin.H{
 		"title": "Add Building",
 	})

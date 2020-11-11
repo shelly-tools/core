@@ -11,23 +11,12 @@ import (
 	"github.com/shelly-tools/core/common"
 	"github.com/shelly-tools/core/config"
 	endpoint "github.com/shelly-tools/core/endpoints"
-	log "github.com/sirupsen/logrus"
 )
 
 func init() {
 	// Prepare logging environment
+	common.PrepareLogInstance()
 
-	common.LogInstance = log.New()
-
-	common.LogInstance.SetFormatter(&log.TextFormatter{
-		DisableColors: false,
-		FullTimestamp: true,
-	})
-
-	common.LogInstance.SetLevel(log.ErrorLevel)
-}
-
-func init() {
 	var err error
 
 	// read config file and create a new Config Struct
@@ -47,20 +36,7 @@ func init() {
 	fmt.Println("Config loaded", common.Config)
 
 	// Set correct log Level
-
-	var logLevel log.Level
-	switch common.Config.Debugging.Logging.LogLevel {
-	case "debug":
-		logLevel = log.DebugLevel
-	case "info":
-		logLevel = log.InfoLevel
-	case "error":
-		logLevel = log.ErrorLevel
-	default:
-		logLevel = log.DebugLevel
-	}
-
-	common.LogInstance.SetLevel(logLevel)
+	common.ChangeLogLevel(common.Config.Debugging.Logging.LogLevel)
 
 }
 
@@ -74,28 +50,28 @@ func main() {
 	} else {
 		defer common.DB.Close()
 	}
+	/*
+		// Prepare GinMode
+		var ginMode string
 
-	// Prepare GinMode
-	var ginMode string
-
-	switch common.Config.Debugging.Router.Mode {
-	case "PROD":
-		common.LogInstance.Debugln("Set router Mode to PROD")
-		ginMode = gin.ReleaseMode
-	case "DEV":
-		common.LogInstance.Debugln("Set router Mode to DEV")
-		ginMode = gin.TestMode
-	}
-
-	gin.SetMode(ginMode)
-	gin.Default().AppEngine = common.Config.Debugging.Router.AppEngine
+		switch common.Config.Debugging.Router.Mode {
+		case "PROD":
+			common.LogInstance.Debugln("Set router Mode to PROD")
+			ginMode = gin.ReleaseMode
+		case "DEV":
+			common.LogInstance.Debugln("Set router Mode to DEV")
+			ginMode = gin.TestMode
+		}
+	*/
+	// gin.SetMode(ginMode)
+	// gin.Default().AppEngine = common.Config.Debugging.Router.AppEngine
 
 	router := gin.Default()
 
 	router.Static("/assets", "ui/assets")
 	router.Static("/"+common.Config.ImageStorePath, common.Config.ImageStorePath)
 	router.Static("/webui", "./webui")
-	router.LoadHTMLGlob("ui/templates/*")
+	router.LoadHTMLGlob("ui/templates/**/*")
 
 	app := router.Group("/app")
 	apiV1 := router.Group("/api/v1")
