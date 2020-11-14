@@ -70,8 +70,11 @@ func main() {
 
 	router.Static("/assets", "ui/assets")
 	router.Static("/"+common.Config.ImageStorePath, common.Config.ImageStorePath)
-	router.Static("/webui", "./webui")
 	router.LoadHTMLGlob("ui/templates/**/*")
+
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "/app")
+	})
 
 	app := router.Group("/app")
 	apiV1 := router.Group("/api/v1")
