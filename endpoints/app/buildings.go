@@ -26,6 +26,7 @@ func GetAllBuildings(c *gin.Context) {
 func AddBuilding(c *gin.Context) {
 	c.HTML(http.StatusOK, "building_create.html", gin.H{
 		"title": "Add Building",
+		"type":  "create",
 	})
 }
 
@@ -69,13 +70,30 @@ func InsertBuilding(c *gin.Context) {
 	var building models.Building
 
 	if err := c.ShouldBind(&building); err == nil {
+
+		file, _ := c.FormFile("picture")
+		if file != nil {
+			// image is available. Save it
+			err = c.SaveUploadedFile(file, common.Config.ImageStorePath)
+
+			if err != nil {
+				common.LogInstance.Errorf("Failed to store image. %v", err)
+			}
+
+			building.PicturePath = file.Filename
+		}
+		// save data to the database
 		err := common.DB.Save(&building)
 		if err != nil {
 			common.LogInstance.Errorf("Failed to store room instance in database: %s", err)
 		}
-		c.Redirect(http.StatusFound, "/app/buildings")
+		c.HTML(http.StatusOK, "building_create.html", gin.H{
+			"title": "Delete Building",
+			"type":  "created",
+			"data":  building,
+		})
 
 	} else {
-		c.String(http.StatusBadRequest, "JSON Structur for a room is wrong")
+		c.String(http.StatusBadRequest, "JSON Structure for a Building is wrong")
 	}
 }

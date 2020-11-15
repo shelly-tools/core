@@ -1,20 +1,26 @@
 {{ template "header.html" }}
   {{ template "menue.html" }}
-
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">Create Building</h1>
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        {{ if ne .type "created" }}
+        <h1 class="h2">Create Building</h1>
+      </div>
+        <form enctype="multipart/form-data" action="/app/buildings/insert" method="POST" target="_blank">
+          <div class="form-group">
+            <label for="Name">Name of the Building</label>
+            <input type="text" class="form-control" name="Name" id="Name" aria-describedby="meHelp" placeholder="Enter name of the building">
           </div>
-          <form enctype="multipart/form-data" action="/app/buildings/insert" method="POST">
-            <div class="form-group">
-              <label for="Name">Name of the Building</label>
-              <input type="text" class="form-control" name="Name" id="Name" aria-describedby="meHelp" placeholder="Enter name of the building">
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
-          
-        </main>
-    </div>
-    {{ template "footer.html" }}
+          <div class="form-group">
+            <label for="picture">Building Picture (optional)</label>
+            <input type="file" class="form-control-file" id="picture" name="picture">
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form> 
+    {{ else }} 
+      <h1 class="h2">Building {{ .data.Name }} Created</h1>
+    {{ end }}
+    </main>
+  </div>
+  {{ template "footer.html" }}
 </body>
 </html>

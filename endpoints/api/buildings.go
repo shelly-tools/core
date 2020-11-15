@@ -1,9 +1,8 @@
 package api
 
 import (
-	"encoding/base64"
+	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -50,32 +49,29 @@ func InsertOneBuilding(c *gin.Context) {
 		msg.Status = "ok"
 		c.JSON(http.StatusOK, msg)
 
-		decodedString, err := base64.StdEncoding.DecodeString(building.PictureData)
-		if err != nil {
-			panic(err)
-		}
+		file, _ := c.FormFile("file")
+		log.Println(file.Filename)
+		/*
+			f, err := os.Create(common.Config.ImageStorePath + building.PicturePath)
+			if err != nil {
+				panic(err)
+			}
+			defer f.Close()
 
-		building.PicturePath = common.Config.ImageStorePath + building.PicturePath
+				if _, err := f.Write(decodedString); err != nil {
+					panic(err)
+				}
 
-		f, err := os.Create(building.PicturePath)
-		if err != nil {
-			panic(err)
-		}
-		defer f.Close()
+				if err := f.Sync(); err != nil {
+					panic(err)
+				}
 
-		if _, err := f.Write(decodedString); err != nil {
-			panic(err)
-		}
-
-		if err := f.Sync(); err != nil {
-			panic(err)
-		}
-
-		building.PictureData = ""
-		err = common.DB.Save(&building)
-		if err != nil {
-			common.LogInstance.Errorf("Failed to store building instance in database: %s", err)
-		}
+				building.PictureData = ""
+				err = common.DB.Save(&building)
+				if err != nil {
+					common.LogInstance.Errorf("Failed to store building instance in database: %s", err)
+				}
+		*/
 	} else {
 		c.String(http.StatusBadRequest, "JSON structure for building is wrong")
 	}
