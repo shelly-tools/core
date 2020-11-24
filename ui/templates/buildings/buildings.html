@@ -1,8 +1,7 @@
 {{ template "header.html" }}
-  {{ template "menue.html" }}
-  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+  <main role="main">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-      <h4 style="color:#eee;">Buildings</h4>    
+      <h2>Buildings</h2>    
         <div class="btn-toolbar mb-2 mb-md-0">
           <div class="btn-group mr-2">
             <button type="button" class="btn btn-sm btn-secondary" id="new" name="new">Create</button>
@@ -13,7 +12,7 @@
           </button>
         </div>
     </div>
-  <table class="table table-sm table-striped">
+  <table class="table table-dark table-sm table-striped">
     <thead>
       <tr>
         <th>#</th>
@@ -27,14 +26,14 @@
         <td>{{ .ID}}</td>
         <td>{{ .Name }}</td>
         <td>
-          <a style="margin: 0 5px" href="/app/buildings/edit/{{ .ID }}" type="button" class="btn btn-sm btn-outline-info"><i class="mdi mdi-cog-outline"></i></a>
-          <a style="margin: 0 5px" href="/app/buildings/delete/{{ .ID }}" type="button" class="btn btn-sm btn-outline-danger"><i class="mdi mdi-delete"></i></a>
+          <a style="margin: 0 5px" href="/app/buildings/edit/{{ .ID }}" type="button" class="btn btn-sm btn-info"><i class="mdi mdi-cog-outline"></i></a>
+          <a style="margin: 0 5px" href="/app/buildings/delete/{{ .ID }}" type="button" class="btn btn-sm btn-danger"><i class="mdi mdi-delete"></i></a>
         </td>
       </tr>
     {{ end }}
     </tbody>
   </table>
-  {{ template "footer.html" }}
+  {{ template "javascript.html" }}
   <script>
     $( document ).ready(function() {
       console.log("is ready");
@@ -44,6 +43,4 @@
       });
     });
   </script>
-  
-</body>
-</html>
+  {{ template "footer.html" }}

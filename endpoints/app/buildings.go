@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -72,22 +71,10 @@ func InsertBuilding(c *gin.Context) {
 
 	var building models.Building
 
-	file, _ := c.FormFile("PictureData")
-	fmt.Println(file)
-
 	if err := c.ShouldBind(&building); err == nil {
-		file, err := c.FormFile("PictureData")
 		if err != nil {
 			fmt.Println("Error", err)
 		}
-		filePath := common.Config.ImageStorePath + file.Filename
-		fmt.Println("Store to", filePath)
-		err = c.SaveUploadedFile(file, filePath)
-
-		if err != nil {
-			log.Println(err)
-		}
-		building.PictureData = ""
 		err = common.DB.Save(&building)
 		if err != nil {
 			common.LogInstance.Errorf("Failed to store building instance in database: %s", err)
