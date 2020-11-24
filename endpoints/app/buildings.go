@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -9,6 +11,7 @@ import (
 	"github.com/shelly-tools/core/models"
 )
 
+// GetAllBuildings shows a template with all buildings listed
 func GetAllBuildings(c *gin.Context) {
 
 	var buildings []models.Building
@@ -23,6 +26,7 @@ func GetAllBuildings(c *gin.Context) {
 	})
 }
 
+// AddBuilding shows a template for adding a building
 func AddBuilding(c *gin.Context) {
 	c.HTML(http.StatusOK, "building_create.html", gin.H{
 		"title": "Add Building",
@@ -46,7 +50,7 @@ func DeleteBuilding(c *gin.Context) {
 	})
 }
 
-// DeleteBuilding shows a template for deleting a building
+// RemoveBuilding shows a template for deleting a building
 func RemoveBuilding(c *gin.Context) {
 
 	var building models.Building
@@ -68,14 +72,63 @@ func InsertBuilding(c *gin.Context) {
 
 	var building models.Building
 
+	file, _ := c.FormFile("PictureData")
+	fmt.Println(file)
+
 	if err := c.ShouldBind(&building); err == nil {
-		err := common.DB.Save(&building)
+		file, err := c.FormFile("PictureData")
 		if err != nil {
-			common.LogInstance.Errorf("Failed to store room instance in database: %s", err)
+			fmt.Println("Error", err)
+		}
+		filePath := common.Config.ImageStorePath + file.Filename
+		fmt.Println("Store to", filePath)
+		err = c.SaveUploadedFile(file, filePath)
+
+		if err != nil {
+			log.Println(err)
+		}
+		building.PictureData = ""
+		err = common.DB.Save(&building)
+		if err != nil {
+			common.LogInstance.Errorf("Failed to store building instance in database: %s", err)
 		}
 		c.Redirect(http.StatusFound, "/app/buildings")
 
 	} else {
-		c.String(http.StatusBadRequest, "JSON Structur for a room is wrong")
+		c.String(http.StatusBadRequest, "ShouldBind for building failed")
+	}
+}
+
+// EditBuilding shows a template for editing a building
+func EditBuilding(c *gin.Context) {
+
+	var building models.Building
+	id := c.Param("id")
+	i, _ := strconv.Atoi(id)
+	err := common.DB.One("ID", i, &building)
+	if err != nil {
+		common.LogInstance.Errorf("Failed to get all buildings from the db:", err)
+	}
+
+	c.HTML(http.StatusOK, "building_edit.html", gin.H{
+		"title": "Edit Building",
+		"data":  building,
+	})
+}
+
+// UpdateBuilding stores the modified building to our database
+func UpdateBuilding(c *gin.Context) {
+
+	var building models.Building
+
+	if err := c.ShouldBind(&building); err == nil {
+		err := common.DB.Update(&building)
+		if err != nil {
+			common.LogInstance.Errorf("Failed to update building instance in database: %s", err)
+		}
+		c.Redirect(http.StatusFound, "/app/buildings")
+
+	} else {
+		c.String(http.StatusBadRequest, "JSON Structure for building was wrong")
 	}
 }
