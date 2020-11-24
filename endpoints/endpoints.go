@@ -31,6 +31,8 @@ func RegisterAPPEndpoints(app *gin.RouterGroup) {
 	app.POST("/buildings/insert", APP.InsertBuilding)
 	app.GET("/buildings/delete/:id", APP.DeleteBuilding)
 	app.POST("/buildings/remove/", APP.RemoveBuilding)
+	app.GET("/buildings/edit/:id", APP.EditBuilding)
+	app.POST("/buildings/update/", APP.UpdateBuilding)
 
 	app.GET("/rooms", APP.GetAllRooms)
 }
